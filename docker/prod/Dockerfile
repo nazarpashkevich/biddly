@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:23-alpine
 
 # https://github.com/nodejs/docker-node/issues/2175#issuecomment-2530593321
 RUN ln -s /usr/lib/libssl.so.3 /lib/libssl.so.3
