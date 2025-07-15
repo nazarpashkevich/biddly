@@ -2,8 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SignUpResponseDto {
   @ApiProperty({
-    description: 'Access token',
-    example: 'access_token',
+    description: 'User`s access token',
+    example: true,
   })
-  accessToken: string | null;
+  access_token: boolean;
 }

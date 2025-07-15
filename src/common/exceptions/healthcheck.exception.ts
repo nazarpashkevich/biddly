@@ -1,16 +1,16 @@
 import { HttpStatus } from '@nestjs/common';
-import { AbstractReportableException } from 'src/common/exceptions/abstract-reportable.excepton';
 import { ApiErrorCodeEnum } from 'src/common/constants/api/api-error-code.enum';
+import { AbstractReportableException } from './abstract-reportable.excepton';
 
-export class AuthException extends AbstractReportableException {
+export class HealthcheckException extends AbstractReportableException {
   constructor(
-    message: string = 'Auth failed, invalid credentials',
+    message: string = 'Healthcheck exception passed.',
     statusCode: HttpStatus = HttpStatus.BAD_REQUEST
   ) {
     super(message, statusCode);
   }
 
   getApiErrorCode(): string {
-    return ApiErrorCodeEnum.AUTH_EXCEPTION;
+    return ApiErrorCodeEnum.HEALTHCHECK;
   }
 }

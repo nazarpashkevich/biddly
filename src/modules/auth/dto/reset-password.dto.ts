@@ -1,6 +1,13 @@
-import { IsNotEmpty, IsString, MinLength, Validate } from 'class-validator';
-import { MatchValidation } from 'src/common/validators/match.validator';
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MinLength,
+  Validate,
+} from 'class-validator';
+import { MatchValidation } from '../../../common/validators/match.validator';
+import { AuthConstants } from '../constants/auth.constants';
 
 export class ResetPasswordDto {
   @ApiProperty()
@@ -11,6 +18,7 @@ export class ResetPasswordDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
+  @Matches(AuthConstants.validation.passwordRegex)
   password: string;
 
   @ApiProperty()

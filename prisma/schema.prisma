@@ -28,9 +28,10 @@ model User {
 model ResetPasswordToken {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
   token     String   @unique
   expiresAt DateTime @map("expires_at")
+
+  user User @relation(fields: [userId], references: [id])
 
   @@map("reset_password_tokens")
 }

@@ -1,22 +1,46 @@
-FROM node:23-alpine
+# ----------- Stage 1: Build -----------
+FROM node:22-alpine AS builder
 
-# https://github.com/nodejs/docker-node/issues/2175#issuecomment-2530593321
-RUN ln -s /usr/lib/libssl.so.3 /lib/libssl.so.3
-
-# create a working directory
+# Set working directory
 WORKDIR /app
 
-# bundle app source
-COPY . .
+# Copy package files first to leverage Docker cache
+COPY yarn.lock package.json ./
 
-# install app dependencies
+# Install all dependencies (including devDependencies)
 RUN yarn install
 
-# creates a "dist" folder with the production build
+# Copy the rest of the project files
+COPY . .
+
+# Generate Prisma scheme
+RUN npx prisma generate
+
+# Build the app
 RUN yarn build
 
-# set the environment variable
+# ----------- Stage 2: Production -----------
+FROM node:22-alpine AS production
+
+# Set working directory
+WORKDIR /app
+
+# Copy only the necessary files for production
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/yarn.lock ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/prisma ./prisma
+
+# Copy static files
+COPY --from=builder /app/public ./public
+
+# Installation of only production depending
+RUN yarn install --production
+
+# Installation of a variable environment
 ENV NODE_ENV=production
 
-# launch command for production environment
-ENTRYPOINT ["sh", "-c", "yarn prisma migrate deploy && yarn start:prod"]
+COPY docker/prod/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

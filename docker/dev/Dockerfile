@@ -1,7 +1,15 @@
-FROM node:23-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
 RUN corepack enable
 
-ENTRYPOINT ["sh", "-c", "npx prisma generate && yarn prisma migrate deploy && yarn start:dev"]
+# copy yarn files
+COPY package.json yarn.lock ./
+
+RUN yarn install
+
+COPY docker/dev/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

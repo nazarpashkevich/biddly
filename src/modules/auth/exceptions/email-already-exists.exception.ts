@@ -1,9 +1,9 @@
 import { ApiErrorCodeEnum } from 'src/common/constants/api/api-error-code.enum';
-import { AuthException } from './auth.exception';
+import { AbstractReportableException } from '../../../common/exceptions/abstract-reportable.excepton';
 
-export class EmailAlreadyExistsException extends AuthException {
+export class EmailAlreadyExistsException extends AbstractReportableException {
   constructor() {
-    super('User with such email already exists');
+    super('Healthcheck exception passed.');
   }
 
   getApiErrorCode(): string {

@@ -1,19 +1,19 @@
 import { Controller } from '@nestjs/common';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { UserService } from '../user/user.service';
-import { MailService } from 'src/modules/mail/mail.service';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
-import { forgotPasswordConfig } from './config/forgot-password.config';
+import { PrismaService } from '../prisma/prisma.service';
+import { UserService } from '../user/user.service';
+import { AuthConstants } from './constants/auth.constants';
+import { ForgotPasswordConstants } from './constants/forgot-password.constants';
+import { ExpiredResetTokenException } from './exceptions/expired-reset-token.exception';
 import { InvalidResetTokenException } from './exceptions/invalid-reset-token.exception';
 
 @Controller('auth')
 export class ForgotPasswordService {
   constructor(
     private prismaService: PrismaService,
-    private userService: UserService,
-    private mailService: MailService
+    private userService: UserService
   ) {}
 
   async forgotPassword(email: string): Promise<void> {
@@ -26,29 +26,48 @@ export class ForgotPasswordService {
 
     const token = await this.createTokenForUser(user);
 
-    await this.mailService.sendResetPasswordEmail(token, user.email);
+    // @todo
+    // await this.mailService.sendResetPasswordEmail(token, user.email);
   }
 
   async resetPassword(token: string, newPassword: string): Promise<User> {
-    const user = await this.userByToken(token);
+    try {
+      const user = await this.userByToken(token);
 
-    const password = await bcrypt.hash(newPassword, 10);
+      const password = await bcrypt.hash(
+        newPassword,
+        AuthConstants.password.saltRounds
+      );
 
-    await this.userService.update(user, { password });
+      await Promise.all([
+        this.userService.update(user, { password }),
+        this.deleteToken(token),
+      ]);
 
-    await this.deleteToken(token);
-
-    return user;
+      return user;
+    } catch (error) {
+      if (error instanceof ExpiredResetTokenException) {
+        await Promise.all([
+          this.deleteToken(token),
+          this.forgotPassword(error.email),
+        ]);
+      }
+      throw error;
+    }
   }
 
   async createTokenForUser(user: User): Promise<string> {
-    const token = randomBytes(forgotPasswordConfig.tokenLength).toString('hex');
+    const token = randomBytes(ForgotPasswordConstants.tokenLength).toString(
+      'hex'
+    );
 
     await this.prismaService.resetPasswordToken.create({
       data: {
         userId: user.id,
         token,
-        expiresAt: new Date(Date.now() + forgotPasswordConfig.tokenExpiresIn),
+        expiresAt: new Date(
+          Date.now() + ForgotPasswordConstants.tokenExpiresIn
+        ),
       },
     });
 
@@ -60,8 +79,16 @@ export class ForgotPasswordService {
       where: { token },
     });
 
-    if (!tokenEntry || tokenEntry.expiresAt < new Date()) {
+    if (!tokenEntry) {
       throw new InvalidResetTokenException();
+    }
+
+    if (tokenEntry.expiresAt < new Date()) {
+      const user = await this.userService.findById(tokenEntry.userId);
+      if (!user) {
+        throw new InvalidResetTokenException();
+      }
+      throw new ExpiredResetTokenException(user.email);
     }
 
     const user = await this.userService.findById(tokenEntry.userId);
@@ -73,7 +100,7 @@ export class ForgotPasswordService {
     return user;
   }
 
-  async deleteToken(token: string): Promise<void> {
+  protected async deleteToken(token: string): Promise<void> {
     await this.prismaService.resetPasswordToken.delete({
       where: { token },
     });

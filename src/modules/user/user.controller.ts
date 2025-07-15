@@ -1,17 +1,19 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
 import {
   ApiBearerAuth,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
-import { BaseController } from 'src/common/base.controller';
+import { ApiResponseDto } from 'src/common/dto/api-response.dto';
+import { BaseController } from '../../common/base.controller';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { UserResponseDto } from './dto/user-response.dto';
-import { ApiResponseDto } from 'src/common/dto/api-response.dto';
+import { UserService } from './user.service';
 
+@ApiTags('Users')
 @Controller('users')
 @UseGuards(AuthGuard)
 @ApiBearerAuth('JWT')

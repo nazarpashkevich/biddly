@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { HealthcheckException } from './common/exceptions/healthcheck.exception';
 
 @Injectable()
 export class AppService {
@@ -7,6 +8,10 @@ export class AppService {
 
   healthcheck(): string {
     return 'OK';
+  }
+
+  healthcheckError(): never {
+    throw new HealthcheckException();
   }
 
   public isDevelopment(): boolean {

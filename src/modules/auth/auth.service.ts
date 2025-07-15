@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-import { SignUpResponseDto } from './dto/sign-up-response.dto';
+import { SignUpDto } from './dto/sign-up.dto';
 import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
-import { JwtPayloadInterface } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,23 +13,13 @@ export class AuthService {
     private readonly userService: UserService
   ) {}
 
-  async signUp(email: string, password: string): Promise<SignUpResponseDto> {
-    const user = await this.userService.create(email, password);
+  async signUp(data: SignUpDto): Promise<string> {
+    const user = await this.userService.create(data);
 
-    const accessToken = await this.accessToken({
-      id: user.id,
-      email: user.email,
-    });
-
-    return {
-      accessToken,
-    };
+    return this.accessToken(user);
   }
 
-  async login(
-    email: string,
-    password: string
-  ): Promise<{ accessToken: string }> {
+  async login(email: string, password: string): Promise<string> {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new InvalidCredentialsException();
@@ -40,23 +29,28 @@ export class AuthService {
       user,
       password
     );
+
     if (!isPasswordValid) {
       throw new InvalidCredentialsException();
     }
 
-    return {
-      accessToken: await this.accessToken({ id: user.id, email: user.email }),
-    };
+    return this.accessToken(user);
   }
 
   public async accessToken(
-    payload: JwtPayloadInterface,
+    user: { id: number; email: string },
     expiresIn?: string
   ): Promise<string> {
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn:
-        expiresIn || this.configService.get<string>('JWT_EXPIRES_IN', '60m'),
-    });
+    return this.jwtService.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      {
+        secret: this.configService.get<string>('JWT_SECRET'),
+        expiresIn:
+          expiresIn || this.configService.get<string>('JWT_EXPIRES_IN', '60m'),
+      }
+    );
   }
 }

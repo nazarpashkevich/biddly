@@ -1,13 +1,13 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ForgotPasswordService } from './forgot-password.service';
+import { BaseController } from '../../common/base.controller';
+import { ApiOkResponseDto } from '../../common/dto/api-ok-response.dto';
+import { ApiResponseDto } from '../../common/dto/api-response.dto';
+import { AuthService } from './auth.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { BaseController } from 'src/common/base.controller';
-import { ApiOkResponseDto } from 'src/common/dto/api-ok-response.dto';
 import { JwtAuthDto } from './dto/jwt-auth.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { AuthService } from './auth.service';
-import { ApiResponseDto } from 'src/common/dto/api-response.dto';
+import { ForgotPasswordService } from './forgot-password.service';
 
 @Controller('auth')
 @ApiTags('Authentication')
@@ -40,10 +40,7 @@ export class ForgotPasswordController extends BaseController {
     );
 
     return this.respondSuccess({
-      accessToken: await this.authService.accessToken({
-        id: user.id,
-        email: user.email,
-      }),
+      accessToken: await this.authService.accessToken(user),
     });
   }
 }

@@ -6,8 +6,8 @@ export const validationExceptionFactory = (
   const getPrettyClassValidatorErrors = (
     validationErrors: ValidationError[],
     parentProperty = ''
-  ): Array<{ property: string; errors: string[] }> => {
-    const errors: Array<{ property: string; errors: string[] }> = [];
+  ): Record<string, { property: string; errors: string[] }> => {
+    const errors: Record<string, { property: string; errors: string[] }> = {};
 
     const getValidationErrorsRecursively = (
       validationErrors: ValidationError[],
@@ -19,10 +19,10 @@ export const validationExceptionFactory = (
           : error.property;
 
         if (error.constraints) {
-          errors.push({
+          errors[propertyPath] = {
             property: propertyPath,
             errors: Object.values(error.constraints),
-          });
+          };
         }
 
         if (error.children?.length) {

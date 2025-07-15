@@ -10,7 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(email: string, password: string): Promise<User> {
+  async create({ email, password }: { email: string; password: string }) {
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
       throw new EmailAlreadyExistsException();
@@ -18,30 +18,28 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(
       password,
-      AuthConstants.PASSWORD.SALT_ROUNDS
+      AuthConstants.password.saltRounds
     );
 
     return this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       },
     });
   }
 
-  async validatePassword(user: User, password: string): Promise<boolean> {
+  async validatePassword(user: User, password: string) {
     return bcrypt.compare(password, user.password);
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: number): Promise<null | User> {
     return this.prisma.user.findUnique({
       where: { id },
     });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<null | User> {
     const normalizedEmail = email.toLowerCase();
     return this.prisma.user.findUnique({
       where: { email: normalizedEmail },
