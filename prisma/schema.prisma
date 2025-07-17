@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,16 +7,133 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+enum AuctionStatus {
+  DRAFT
+  ACTIVE
+  FINISHED
+  CANCELLED
+}
 
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  email               String               @unique
+  password            String
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  lots                Lot[]
+  bids                Bid[]
+  auctions            Auction[]
+  auctionWatchers     AuctionWatcher[]
+  notifications       Notification[]
+  payments            Payment[]
   resetPasswordTokens ResetPasswordToken[]
 
   @@map("users")
+}
+
+model Lot {
+  id            Int           @id @default(autoincrement())
+  name          String
+  description   String
+  userId        Int           @map("user_id")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  user          User          @relation(fields: [userId], references: [id])
+  auctions      Auction[]     @relation("AuctionLots")
+  lotCategories LotCategory[]
+
+  @@map("lots")
+}
+
+model Auction {
+  id              Int              @id @default(autoincrement())
+  startAt         DateTime         @map("start_at")
+  endAt           DateTime         @map("end_at")
+  startingPrice   Int              @map("starting_price")
+  currentPrice    Int              @map("current_price")
+  status          AuctionStatus
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  lots            Lot[]            @relation("AuctionLots")
+  bids            Bid[]
+  auctionWatchers AuctionWatcher[]
+  winnerId        Int?             @map("winner_id")
+  winner          User?            @relation(fields: [winnerId], references: [id])
+  payment         Payment?         @relation("AuctionPayment")
+
+  @@map("auctions")
+}
+
+model Bid {
+  id        Int      @id @default(autoincrement())
+  auctionId Int      @map("auction_id")
+  userId    Int      @map("user_id")
+  amount    Int
+  createdAt DateTime @default(now()) @map("created_at")
+  auction   Auction  @relation(fields: [auctionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("bids")
+}
+
+model AuctionWatcher {
+  id        Int      @id @default(autoincrement())
+  auctionId Int      @map("auction_id")
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  auction   Auction  @relation(fields: [auctionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("auction_watchers")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model Payment {
+  id        Int           @id @default(autoincrement())
+  auctionId Int           @unique @map("auction_id")
+  userId    Int           @map("user_id")
+  amount    Int
+  status    PaymentStatus
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  user      User          @relation(fields: [userId], references: [id])
+  auction   Auction       @relation("AuctionPayment", fields: [auctionId], references: [id])
+
+  @@map("payments")
+}
+
+model Category {
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
+  lotCategories LotCategory[]
+
+  @@map("categories")
+}
+
+model LotCategory {
+  lotId      Int      @map("lot_id")
+  categoryId Int      @map("category_id")
+  lot        Lot      @relation(fields: [lotId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([lotId, categoryId])
+  @@map("lot_categories")
 }
 
 model ResetPasswordToken {
@@ -30,8 +141,7 @@ model ResetPasswordToken {
   userId    Int      @map("user_id")
   token     String   @unique
   expiresAt DateTime @map("expires_at")
-
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("reset_password_tokens")
 }

@@ -1,0 +1,4 @@
+port {{REDIS_PORT}}
+databases {{REDIS_DATABASES}}
+appendonly yes
+requirepass {{REDIS_PASSWORD}}

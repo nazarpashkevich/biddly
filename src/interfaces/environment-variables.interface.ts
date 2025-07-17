@@ -16,4 +16,12 @@ export interface EnvironmentVariables {
   FRONTEND_URL: string;
 
   NODE_ENV: string;
+
+  SESSION_SECRET: string;
+
+  // # Redis
+  REDIS_HOST?: string;
+  REDIS_PORT?: string;
+  REDIS_PASSWORD?: string;
+  REDIS_DB?: string;
 }
