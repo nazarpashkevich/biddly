@@ -35,6 +35,24 @@ services:
       - DATABASE_URL=postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME}?schema=public
       - FRONTEND_URL=${FRONTEND_URL}
       - BACKEND_URL=${BACKEND_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DB=${REDIS_DB}
       - NODE_ENV=development
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/entrypoint.sh:/usr/local/bin/entrypoint.sh
+      - ./docker/redis/redis.conf.template:/usr/local/etc/redis/redis.conf.template
+    environment:
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_DATABASES: ${REDIS_DATABASES:-16}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    entrypoint: [ "sh", "/usr/local/bin/entrypoint.sh" ]
 volumes:
   postgres_data:

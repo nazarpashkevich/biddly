@@ -48,6 +48,10 @@ services:
       - redis_data:/data
       - ./docker/redis/entrypoint.sh:/usr/local/bin/entrypoint.sh
       - ./docker/redis/redis.conf.template:/usr/local/etc/redis/redis.conf.template
+    environment:
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_DATABASES: ${REDIS_DATABASES:-16}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     entrypoint: [ "sh", "/usr/local/bin/entrypoint.sh" ]
 volumes:
   postgres_data:
