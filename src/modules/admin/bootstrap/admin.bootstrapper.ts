@@ -2,8 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import process from 'node:process';
 import { initComponentLoader } from '../component.loader';
 import { AdminConfig } from '../config/admin.config';
-import { AuctionResource } from '../resources/auction.resource';
-import { UserResource } from '../resources/user.resource';
+import { auctionResource } from '../resources/auction.resource';
+import { lotResource } from '../resources/lot.resource';
+import { userResource } from '../resources/user.resource';
 import { adminAuthBootstrapper } from './admin-auth.bootstrapper';
 import { adminPagesBootstrapper } from './admin-pages.bootstrapper';
 
@@ -28,15 +29,19 @@ export async function adminBootstrapper() {
     Database: AdminJSPrisma.Database,
   });
 
+  // init resources
+  const resources = await Promise.all([
+    auctionResource(prisma, components),
+    lotResource(prisma, components, componentLoader),
+    userResource(prisma),
+  ]);
+
   return AdminModule.createAdminAsync({
     useFactory: () => ({
       adminJsOptions: {
         pages: adminPagesBootstrapper(components),
         componentLoader,
-        resources: [
-          AuctionResource(AdminJSPrisma, prisma),
-          UserResource(AdminJSPrisma, prisma),
-        ],
+        resources,
         ...AdminConfig,
       },
       auth: adminAuthBootstrapper(prisma),

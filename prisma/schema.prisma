@@ -28,7 +28,6 @@ model User {
   updatedAt           DateTime             @updatedAt @map("updated_at")
   lots                Lot[]
   bids                Bid[]
-  auctions            Auction[]
   auctionWatchers     AuctionWatcher[]
   notifications       Notification[]
   payments            Payment[]
@@ -41,30 +40,32 @@ model Lot {
   id            Int           @id @default(autoincrement())
   name          String
   description   String
-  userId        Int           @map("user_id")
+  startingPrice Int           @map("starting_price")
+  currentPrice  Int?          @map("current_price")
+  isSold        Boolean       @map("is_sold") @default(false)
+  pictureSrc    String?
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
-  user          User          @relation(fields: [userId], references: [id])
-  auctions      Auction[]     @relation("AuctionLots")
+  auctionId     Int           @map("auction_id")
+  auction       Auction       @relation(fields: [auctionId], references: [id])
   lotCategories LotCategory[]
+  winnerId      Int?          @map("winner_id")
+  winner        User?         @relation(fields: [winnerId], references: [id])
+  bids          Bid[]
 
   @@map("lots")
 }
 
 model Auction {
   id              Int              @id @default(autoincrement())
+  name            String           @default("")
   startAt         DateTime         @map("start_at")
   endAt           DateTime         @map("end_at")
-  startingPrice   Int              @map("starting_price")
-  currentPrice    Int              @map("current_price")
   status          AuctionStatus
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
-  lots            Lot[]            @relation("AuctionLots")
-  bids            Bid[]
+  lots            Lot[]
   auctionWatchers AuctionWatcher[]
-  winnerId        Int?             @map("winner_id")
-  winner          User?            @relation(fields: [winnerId], references: [id])
   payment         Payment?         @relation("AuctionPayment")
 
   @@map("auctions")
@@ -72,11 +73,11 @@ model Auction {
 
 model Bid {
   id        Int      @id @default(autoincrement())
-  auctionId Int      @map("auction_id")
+  lotId     Int      @map("lot_id")
   userId    Int      @map("user_id")
   amount    Int
   createdAt DateTime @default(now()) @map("created_at")
-  auction   Auction  @relation(fields: [auctionId], references: [id])
+  lot       Lot      @relation(fields: [lotId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("bids")

@@ -1,26 +1,24 @@
 import { getModelByName } from '@adminjs/prisma';
+import { PrismaClient } from '@prisma/client';
 
-export const AuctionResource = (adminJSPrisma, prisma) => ({
+export const auctionResource = (prisma: PrismaClient, components) => ({
   resource: { model: getModelByName('Auction'), client: prisma },
   options: {
+    navigation: {
+      name: 'Main',
+      icon: 'Database',
+    },
     properties: {
       id: { isVisible: { list: true, edit: false, filter: true, show: true } },
       createdAt: {
         isVisible: { list: true, edit: false, filter: true, show: true },
         type: 'datetime',
       },
+      name: {},
       updatedAt: {
         isVisible: { list: false, edit: false, filter: true, show: true },
         type: 'datetime',
       },
-      // lot: {
-      //   reference: 'Lot',
-      //   isVisible: { list: true, edit: false, filter: false, show: true },
-      // },
-      // winner: {
-      //   reference: 'User',
-      //   isVisible: { list: true, edit: false, filter: false, show: true },
-      // },
       status: {
         availableValues: [
           { value: 'DRAFT', label: 'Draft' },
@@ -29,18 +27,13 @@ export const AuctionResource = (adminJSPrisma, prisma) => ({
           { value: 'CANCELLED', label: 'Cancelled' },
         ],
       },
-      currentPrice: { type: 'number' },
-      startingPrice: { type: 'number' },
       startAt: { type: 'datetime' },
       endAt: { type: 'datetime' },
       lots: { isVisible: false },
-      bids: { isVisible: false },
       auctionWatchers: { isVisible: false },
-      winnerId: { isVisible: false },
-      winner: { isVisible: false },
       payment: { isVisible: false },
     },
-    listProperties: ['id', 'status', 'currentPrice', 'startAt', 'endAt'],
+    listProperties: ['id', 'name', 'status', 'startAt', 'endAt'],
     sort: { sortBy: 'createdAt', direction: 'desc' },
   },
 });

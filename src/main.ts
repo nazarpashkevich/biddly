@@ -22,6 +22,7 @@ async function bootstrap() {
   });
 
   // all routes will begin with api
+  // https://github.com/SoftwareBrothers/adminjs/issues/1739
   app.setGlobalPrefix(API_PREFIX, { exclude: [AdminConfig.rootPath] });
   app.use(`/${API_PREFIX}`, express.json());
   app.use(`/${API_PREFIX}`, express.urlencoded({ extended: true }));

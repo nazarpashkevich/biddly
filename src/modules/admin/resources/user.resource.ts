@@ -1,6 +1,7 @@
 import { getModelByName } from '@adminjs/prisma';
+import { PrismaClient } from '@prisma/client';
 
-export const UserResource = (adminJSPrisma, prisma) => ({
+export const userResource = (prisma: PrismaClient) => ({
   resource: { model: getModelByName('User'), client: prisma },
   options: {
     navigation: {
