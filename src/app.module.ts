@@ -8,6 +8,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
+import { AuctionModule } from './modules/auction/auction.module';
 
 @Module({
   imports: [
@@ -20,12 +21,13 @@ import { UserModule } from './modules/user/user.module';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'public'),
-      serveRoot: '/static',
+      serveRoot: '/',
     }),
     PrismaModule,
     AuthModule,
     UserModule,
     AdminModule,
+    AuctionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
