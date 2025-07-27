@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { JwtUserDto } from './dto/jwt-user.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
 
@@ -45,7 +46,7 @@ export class AuthService {
       {
         id: user.id,
         email: user.email,
-      },
+      } as JwtUserDto,
       {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn:

@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
 import { AuctionModule } from './modules/auction/auction.module';
+import { BidModule } from './modules/bid/bid.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AuctionModule } from './modules/auction/auction.module';
     UserModule,
     AdminModule,
     AuctionModule,
+    BidModule,
   ],
   controllers: [AppController],
   providers: [AppService],

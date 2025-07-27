@@ -6,14 +6,17 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
+import { BaseController } from '../../common/base.controller';
 import { ApiResponseDto } from '../../common/dto/api-response.dto';
 import { AuctionService } from './auction.service';
 import { AuctionResponseDto } from './dto/auction-response.dto';
 
 @Controller('auctions')
 @ApiTags('Auctions')
-export class AuctionController {
-  constructor(protected service: AuctionService) {}
+export class AuctionController extends BaseController {
+  constructor(protected service: AuctionService) {
+    super();
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all auctions' })
@@ -25,7 +28,7 @@ export class AuctionController {
   async index() {
     const auctions = await this.service.list();
 
-    return plainToInstance(AuctionResponseDto, auctions);
+    return this.respondSuccess(plainToInstance(AuctionResponseDto, auctions));
   }
 
   @Get(':id')
@@ -42,6 +45,6 @@ export class AuctionController {
       throw new NotFoundException();
     }
 
-    return plainToInstance(AuctionResponseDto, auction);
+    return this.respondSuccess(plainToInstance(AuctionResponseDto, auction));
   }
 }

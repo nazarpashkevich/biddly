@@ -8,6 +8,7 @@ import { LotService } from './lot.service';
 @Module({
   controllers: [AuctionController, LotController],
   providers: [AuctionService, LotService],
+  exports: [AuctionService, LotService],
   imports: [PrismaModule],
 })
 export class AuctionModule {}
