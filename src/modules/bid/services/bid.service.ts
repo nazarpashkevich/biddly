@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Bid, Lot, User } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateBidDto } from './dto/create-bid.dto';
+import { PrismaService } from '../../prisma/prisma.service';
+import { CreateBidDto } from '../dto/create-bid.dto';
 
 @Injectable()
 export class BidService {

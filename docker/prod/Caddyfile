@@ -1,0 +1,28 @@
+{
+  # Email for ACME/Let's Encrypt
+  email {$ACME_EMAIL}
+}
+
+# Single server for both :80 and :443, route by Host header
+:80, :443 {
+  encode gzip
+
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "no-referrer-when-downgrade"
+  }
+
+  # Redirect www to apex
+  @www host www.{$DOMAIN}
+  handle @www {
+    redir https://{$DOMAIN}{uri} permanent
+  }
+
+  # Proxy apex domain to the app service
+  @apex host {$DOMAIN}
+  handle @apex {
+    reverse_proxy app:{$API_PORT}
+  }
+}

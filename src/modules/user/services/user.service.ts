@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
-import { AuthConstants } from '../auth/constants/auth.constants';
-import { EmailAlreadyExistsException } from '../auth/exceptions/email-already-exists.exception';
-import { JwtPayloadInterface } from '../auth/interfaces/jwt-payload.interface';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { EmailAlreadyExistsException } from '../../auth/exceptions/email-already-exists.exception';
+import { AuthConstants } from '../../auth/constants/auth.constants';
+import { JwtPayloadInterface } from '../../auth/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class UserService {
@@ -29,17 +29,17 @@ export class UserService {
     });
   }
 
-  async validatePassword(user: User, password: string) {
+  validatePassword(user: User, password: string) {
     return bcrypt.compare(password, user.password);
   }
 
-  async findById(id: number): Promise<null | User> {
+  findById(id: number): Promise<null | User> {
     return this.prisma.user.findUnique({
       where: { id },
     });
   }
 
-  async findByEmail(email: string): Promise<null | User> {
+  findByEmail(email: string): Promise<null | User> {
     const normalizedEmail = email.toLowerCase();
     return this.prisma.user.findUnique({
       where: { email: normalizedEmail },
@@ -56,7 +56,7 @@ export class UserService {
     return dbUser;
   }
 
-  public async update(user: User, data: Prisma.UserUpdateInput): Promise<User> {
+  public update(user: User, data: Prisma.UserUpdateInput): Promise<User> {
     return this.prisma.user.update({
       where: { id: user.id },
       data,

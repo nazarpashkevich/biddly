@@ -6,10 +6,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
-import { BaseController } from '../../common/base.controller';
-import { ApiResponseDto } from '../../common/dto/api-response.dto';
-import { LotResponseDto } from './dto/lot-response.dto';
-import { LotService } from './lot.service';
+import { BaseController } from '../../../common/base.controller';
+import { LotService } from '../services/lot.service';
+import { ApiResponseDto } from '../../../common/dto/api-response.dto';
+import { LotResponseDto } from '../dto/lot-response.dto';
 
 @ApiTags('Lots')
 @Controller('auctions/:auctionId/lots')

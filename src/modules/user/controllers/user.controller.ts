@@ -8,10 +8,10 @@ import {
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { ApiResponseDto } from 'src/common/dto/api-response.dto';
-import { BaseController } from '../../common/base.controller';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { UserResponseDto } from './dto/user-response.dto';
-import { UserService } from './user.service';
+import { UserResponseDto } from '../dto/user-response.dto';
+import { BaseController } from '../../../common/base.controller';
+import { UserService } from '../services/user.service';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 
 @ApiTags('Users')
 @Controller('users')

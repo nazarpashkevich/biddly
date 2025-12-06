@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
-import { AuctionController } from './auction.controller';
-import { AuctionService } from './auction.service';
-import { LotController } from './lot.controller';
-import { LotService } from './lot.service';
+import { AuctionController } from './controllers/auction.controller';
+import { AuctionService } from './services/auction.service';
+import { LotController } from './controllers/lot.controller';
+import { LotService } from './services/lot.service';
 
 @Module({
   controllers: [AuctionController, LotController],

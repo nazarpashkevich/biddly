@@ -15,13 +15,13 @@ import {
 } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { User } from 'src/common/decorators/user.decorator';
-import { BaseController } from '../../common/base.controller';
-import { ApiResponseDto } from '../../common/dto/api-response.dto';
-import { LotService } from '../auction/lot.service';
-import { JwtUserDto } from '../auth/dto/jwt-user.dto';
-import { BidService } from './bid.service';
-import { BidResponseDto } from './dto/bid-response.dto';
-import { CreateBidDto } from './dto/create-bid.dto';
+import { BaseController } from '../../../common/base.controller';
+import { BidService } from '../services/bid.service';
+import { LotService } from '../../auction/services/lot.service';
+import { ApiResponseDto } from '../../../common/dto/api-response.dto';
+import { BidResponseDto } from '../dto/bid-response.dto';
+import { CreateBidDto } from '../dto/create-bid.dto';
+import { JwtUserDto } from '../../auth/dto/jwt-user.dto';
 
 @ApiTags('Bids')
 @Controller('auctions/:auctionId/lots/:lotId/bids')

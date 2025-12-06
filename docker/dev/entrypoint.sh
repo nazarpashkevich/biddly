@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# check if node_modules exists
+if [ ! -d "node_modules" ]; then
+  echo "Installing dependencies..."
+  yarn install
+fi
+
 npx prisma generate
 npx prisma migrate deploy
 

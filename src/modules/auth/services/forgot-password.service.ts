@@ -2,12 +2,12 @@ import { Controller } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
-import { PrismaService } from '../prisma/prisma.service';
-import { UserService } from '../user/user.service';
-import { AuthConstants } from './constants/auth.constants';
-import { ForgotPasswordConstants } from './constants/forgot-password.constants';
-import { ExpiredResetTokenException } from './exceptions/expired-reset-token.exception';
-import { InvalidResetTokenException } from './exceptions/invalid-reset-token.exception';
+import { PrismaService } from '../../prisma/prisma.service';
+import { UserService } from '../../user/services/user.service';
+import { AuthConstants } from '../constants/auth.constants';
+import { ExpiredResetTokenException } from '../exceptions/expired-reset-token.exception';
+import { ForgotPasswordConstants } from '../constants/forgot-password.constants';
+import { InvalidResetTokenException } from '../exceptions/invalid-reset-token.exception';
 
 @Controller('auth')
 export class ForgotPasswordService {

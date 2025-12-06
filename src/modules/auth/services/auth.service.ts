@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
-import { JwtUserDto } from './dto/jwt-user.dto';
-import { SignUpDto } from './dto/sign-up.dto';
-import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
+import { UserService } from '../../user/services/user.service';
+import { SignUpDto } from '../dto/sign-up.dto';
+import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
+import { JwtUserDto } from '../dto/jwt-user.dto';
 
 @Injectable()
 export class AuthService {

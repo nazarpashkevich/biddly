@@ -17,6 +17,6 @@ export function adminAuthBootstrapper(prisma: PrismaClient) {
       };
     },
     cookieName: process.env.ADMIN_COOKIE_NAME || 'adminjs',
-    cookiePassword: process.env.ADMIN_COOKIE_SECRET || 'adminjs',
+    cookiePassword: <string>process.env.ADMIN_COOKIE_SECRET,
   };
 }

@@ -7,12 +7,12 @@ import {
 } from '@nestjs/swagger';
 import { BaseController } from 'src/common/base.controller';
 import { ApiResponseDto } from 'src/common/dto/api-response.dto';
-import { AuthService } from './auth.service';
-import { JwtAuthDto } from './dto/jwt-auth.dto';
-import { LoginDto } from './dto/login.dto';
-import { SignUpResponseDto } from './dto/sign-up-response.dto';
-import { SignUpDto } from './dto/sign-up.dto';
-import { VerifyEmailResponseDto } from './dto/verify-email-response.dto';
+import { JwtAuthDto } from '../dto/jwt-auth.dto';
+import { SignUpResponseDto } from '../dto/sign-up-response.dto';
+import { VerifyEmailResponseDto } from '../dto/verify-email-response.dto';
+import { AuthService } from '../services/auth.service';
+import { LoginDto } from '../dto/login.dto';
+import { SignUpDto } from '../dto/sign-up.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')

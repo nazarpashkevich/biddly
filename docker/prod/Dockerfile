@@ -1,5 +1,5 @@
 # ----------- Stage 1: Build -----------
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -20,7 +20,7 @@ RUN npx prisma generate
 RUN yarn build
 
 # ----------- Stage 2: Production -----------
-FROM node:22-alpine AS production
+FROM node:24-alpine AS production
 
 # Set working directory
 WORKDIR /app

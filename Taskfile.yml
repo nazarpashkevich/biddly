@@ -1,0 +1,150 @@
+version: '3'
+
+vars:
+  DC_DEV: docker-compose.yml
+  DC_PROD: docker-compose.prod.yml
+  SERVICE: backend
+
+tasks:
+
+  # -------------------------------
+  # Base
+  # -------------------------------
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  sh:
+    desc: Open a shell inside the service container
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec {{.SERVICE}} sh
+
+  clean:
+    desc: Remove node_modules and reinstall dependencies
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} rm -rf node_modules
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn install
+
+  # -------------------------------
+  # Docker dev lifecycle
+  # -------------------------------
+  up:
+    desc: Start app in dev mode
+    cmds:
+      - docker compose -f {{.DC_DEV}} up --build
+
+  down:
+    desc: Stop containers
+    cmds:
+      - docker compose -f {{.DC_DEV}} down
+
+  restart:
+    desc: Restart dev containers
+    cmds:
+      - task down
+      - task up
+
+  logs:
+    desc: Show container logs
+    cmds:
+      - docker compose -f {{.DC_DEV}} logs -f
+
+  # -------------------------------
+  # Build & Code Quality
+  # -------------------------------
+  install:
+    desc: Install Node.js dependencies
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn install
+
+  build:
+    desc: Build project
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn build
+
+  lint:
+    desc: Lint and fix issues
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn lint
+
+  format:
+    desc: Format code with Prettier
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn format
+
+  # -------------------------------
+  # Tests
+  # -------------------------------
+  test:
+    desc: Run unit tests
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn test
+
+  test:watch:
+    desc: Run unit tests in watch mode
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn test:watch
+
+  test:cov:
+    desc: Run tests with coverage
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn test:cov
+
+  test:e2e:
+    desc: Run E2E tests
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn test:e2e
+
+  # -------------------------------
+  # Prisma
+  # -------------------------------
+  prisma:generate:
+    desc: Generate Prisma client
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn prisma generate
+
+  prisma:migrate:
+    desc: Create and apply Prisma migration (dev)
+    vars:
+      NAME: ''
+    cmds:
+      - |
+        if [ -z "{{.NAME}}" ]; then
+          echo "Provide a migration name: task prisma:migrate -- NAME=init";
+          exit 1;
+        fi
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn prisma migrate dev --name {{.NAME}}
+
+  prisma:migrate:deploy:
+    desc: Deploy migrations
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn prisma migrate deploy
+
+  db:push:
+    desc: Push Prisma schema to DB
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn prisma db push
+
+  seed:
+    desc: Seed database
+    cmds:
+      - docker compose -f {{.DC_DEV}} exec -T {{.SERVICE}} yarn ts-node prisma/seeds/seed.ts
+
+  # -------------------------------
+  # Production helpers
+  # -------------------------------
+  prod:up:
+    desc: Start production environment
+    cmds:
+      - docker compose -f {{.DC_PROD}} up --build -d
+
+  prod:down:
+    desc: Stop production environment
+    cmds:
+      - docker compose -f {{.DC_PROD}} down
+
+  prod:logs:
+    desc: Show production logs
+    cmds:
+      - docker compose -f {{.DC_PROD}} logs -f
